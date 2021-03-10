@@ -1,0 +1,47 @@
+parameter (or (pair %ask (contract (pair string
+                                         nat))
+                         string)
+              (or (or (mutez %setPrice)
+                      (address %setOwner))
+                  (mutez %withdraw)));
+storage (pair (address %owner)
+              (mutez %price));
+code { DUP;
+       CAR;
+       DIP { CDR };
+       IF_LEFT { DROP;
+                 DUP;
+                 CDR;
+                 AMOUNT;
+                 COMPARE;
+                 EQ;
+                 IF { NIL operation }
+                    { PUSH string "wrong price";
+                      FAILWITH } }
+               { SWAP;
+                 DUP;
+                 CAR;
+                 SENDER;
+                 COMPARE;
+                 EQ;
+                 IF { SWAP;
+                      IF_LEFT { IF_LEFT { SWAP;
+                                          CAR }
+                                        { SWAP;
+                                          CDR;
+                                          SWAP };
+                                PAIR;
+                                NIL operation }
+                              { SENDER;
+                                CONTRACT unit;
+                                IF_NONE { PUSH string "not receiver";
+                                          FAILWITH }
+                                        { SWAP;
+                                          UNIT;
+                                          TRANSFER_TOKENS;
+                                          NIL operation;
+                                          SWAP;
+                                          CONS } } }
+                    { PUSH string "not admin";
+                      FAILWITH } };
+       PAIR };

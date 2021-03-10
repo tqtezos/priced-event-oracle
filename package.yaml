@@ -1,0 +1,84 @@
+<<: !include "./hpack/module.yaml"
+
+<<: *meta
+name:                priced-event-oracle
+version:             0.1.1.0
+github:              "tqtezos/priced-event-oracle"
+license:             BSD3
+author:              "Michael J. Klein, TQ Tezos"
+maintainer:          "michael.klein@tqtezos.com"
+copyright:           "2021 Michael J. Klein, TQ Tezos"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/tqtezos/priced-event-oracle#readme>
+
+library:
+  <<: *lorentz-lib-common
+
+  dependencies:
+    - containers
+    - data-default
+    - fmt
+    - morley
+    - lorentz
+    - morley-prelude
+    - morley-ledgers
+    - named
+    - singletons
+    - text
+    - vinyl
+    - cryptonite
+    - bytestring
+    - aeson
+    - constraints
+    - binary
+    - optparse-applicative
+    - transformers
+    - megaparsec
+    - base16-bytestring
+    - with-utf8
+
+executables:
+  priced-event-oracle:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - priced-event-oracle
+    - optparse-applicative
+    - morley
+    - lorentz
+    - named
+    - text
+    - morley-prelude
+    - ansi-wl-pprint
+
+tests:
+  priced-event-oracle-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - priced-event-oracle
+    - morley
+    - morley-prelude
+    - morley-ledgers-test
+    - lorentz
+    - cleveland
+    - tasty
+    - tasty-hspec
+    - tasty-quickcheck
+    - QuickCheck
+    - hspec
+    - containers
+    - mtl
+    - fmt
+

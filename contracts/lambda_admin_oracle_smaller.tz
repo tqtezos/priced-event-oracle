@@ -1,0 +1,31 @@
+parameter (or (pair %ask (contract (pair string
+                                         nat))
+                         string)
+              (lambda %u (pair address
+                               mutez)
+                         (pair (list operation)
+                               (pair address
+                                     mutez))));
+storage (pair address
+              mutez);
+code { DUP;
+       CDR;
+       SWAP;
+       CAR;
+       IF_LEFT { DROP;
+                 DUP;
+                 CDR;
+                 AMOUNT;
+                 COMPARE;
+                 EQ;
+                 IF { NIL operation;
+                      PAIR }
+                    { FAILWITH } }
+               { SWAP;
+                 DUP;
+                 CAR;
+                 SENDER;
+                 COMPARE;
+                 EQ;
+                 IF { EXEC }
+                    { FAILWITH } } };
