@@ -1,0 +1,85 @@
+{ parameter (or (unit %ask) (pair %respond bytes nat)) ;
+  storage
+    (pair (pair (nat %counter) (address %owner)) (pair (bytes %response) (bool %waiting))) ;
+  code { SELF %respond ;
+         SWAP ;
+         UNPAIR ;
+         IF_LEFT
+           { DROP ;
+             DUP ;
+             CAR ;
+             CDR ;
+             SENDER ;
+             COMPARE ;
+             EQ ;
+             IF { PUSH bool True ;
+                  SWAP ;
+                  DUP ;
+                  DUG 2 ;
+                  CDR ;
+                  CAR ;
+                  PAIR ;
+                  SWAP ;
+                  CAR ;
+                  PAIR ;
+                  NIL operation ;
+                  PUSH address "KT1VcDH6SWd3QAWZf3M1DuD4i7zqtZq8CXSa%ask" ;
+                  CONTRACT (pair (contract (pair bytes nat)) string) ;
+                  IF_NONE
+                    { DIG 2 ; DROP ; PUSH string "oracle not found" ; FAILWITH }
+                    { PUSH mutez 1 ;
+                      PUSH string
+                           "query=AirTemperatureData[Entity[\\\"City\\\", {\\\"NewYork\\\", \\\"NewYork\\\", \\\"UnitedStates\\\"}]]&precision=auto&unit=metric" ;
+                      DIG 5 ;
+                      PAIR ;
+                      TRANSFER_TOKENS } ;
+                  CONS ;
+                  PAIR }
+                { DROP 2 ; PUSH string "only admin may update" ; FAILWITH } }
+           { DIG 2 ;
+             DROP ;
+             SWAP ;
+             DUP ;
+             DUG 2 ;
+             CDR ;
+             CDR ;
+             IF { PUSH address "tz1drDkC2hJk1pzyMuqbDpvB3HeRVmVJRL2E" ;
+                  SENDER ;
+                  COMPARE ;
+                  EQ ;
+                  IF { UNPAIR ;
+                       DUP 3 ;
+                       CAR ;
+                       CAR ;
+                       DIG 2 ;
+                       COMPARE ;
+                       EQ ;
+                       IF { PUSH bool False ;
+                            DUP 3 ;
+                            CDR ;
+                            CAR ;
+                            PAIR ;
+                            DUP 3 ;
+                            CAR ;
+                            PAIR ;
+                            DUP ;
+                            CDR ;
+                            CDR ;
+                            DIG 2 ;
+                            PAIR ;
+                            SWAP ;
+                            CAR ;
+                            CDR ;
+                            PUSH nat 1 ;
+                            DIG 3 ;
+                            CAR ;
+                            CAR ;
+                            ADD ;
+                            PAIR ;
+                            PAIR ;
+                            NIL operation ;
+                            PAIR }
+                          { DROP 2 ; PUSH string "unexpected counter" ; FAILWITH } }
+                     { DROP 2 ; PUSH string "not responder" ; FAILWITH } }
+                { DROP 2 ; PUSH string "not waiting" ; FAILWITH } } } }
+

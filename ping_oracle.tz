@@ -1,0 +1,68 @@
+parameter (or (unit %ask)
+              (pair %respond string
+                             nat));
+storage (pair (bool %waiting)
+              (pair (string %response)
+                    (nat %counter)));
+code { DUP;
+       CAR;
+       DIP { CDR };
+       IF_LEFT { DROP;
+                 DUP;
+                 CAR;
+                 DIP { CDR };
+                 IF { PUSH string "waiting";
+                      FAILWITH }
+                    { SENDER;
+                      PUSH address "tz1QS8VYYVDjv7iReBzXeheL6x63A1oATTj8";
+                      COMPARE;
+                      EQ;
+                      IF { PUSH address "tz1QS8VYYVDjv7iReBzXeheL6x63A1oATTj8";
+                           CONTRACT (pair (contract (pair string nat)) string);
+                           IF_NONE { PUSH string "oracle not found";
+                                     FAILWITH }
+                                   { SWAP;
+                                     DIP { PUSH string "some_query";
+                                           SELF %respond;
+                                           PAIR;
+                                           PUSH mutez 10;
+                                           SWAP;
+                                           TRANSFER_TOKENS };
+                                     PUSH bool True;
+                                     PAIR;
+                                     SWAP;
+                                     NIL operation;
+                                     SWAP;
+                                     CONS } }
+                         { PUSH string "not owner";
+                           FAILWITH } } }
+               { SWAP;
+                 DUP;
+                 CAR;
+                 DIP { CDR };
+                 IF { SENDER;
+                      PUSH address "tz1QS8VYYVDjv7iReBzXeheL6x63A1oATTj8";
+                      COMPARE;
+                      EQ;
+                      IF { CDR;
+                           SWAP;
+                           DUP;
+                           CAR;
+                           DIP { CDR;
+                                 DUP;
+                                 PUSH nat 1;
+                                 ADD;
+                                 DIP { COMPARE;
+                                       EQ;
+                                       IF {  }
+                                          { PUSH string "unexpected counter";
+                                            FAILWITH } } };
+                           PAIR;
+                           PUSH bool False;
+                           PAIR;
+                           NIL operation }
+                         { PUSH string "not responder";
+                           FAILWITH } }
+                    { PUSH string "not waiting";
+                      FAILWITH } };
+       PAIR };
