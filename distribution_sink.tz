@@ -1,0 +1,3 @@
+parameter (list (pair nat (list address)));
+storage unit;
+code {CDR; NIL operation; PAIR}
